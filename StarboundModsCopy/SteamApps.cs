@@ -9,6 +9,12 @@ namespace StarboundModsCopy {
     public class SteamApps {
         public readonly string SteamPath;
 
+        public struct Game {
+            public string library;
+            public KeyValue info;
+        };
+
+
         public SteamApps() {
             var key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Valve\\Steam") ??
                       RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).OpenSubKey("SOFTWARE\\Valve\\Steam");
@@ -29,13 +35,15 @@ namespace StarboundModsCopy {
             var steamApps = SteamPath + "/steamapps";
             var libraryFoldersPath = steamApps + "/libraryfolders.vdf";
             var libraryFoldersKv = KeyValue.LoadAsText(libraryFoldersPath);
-            var libraryFolders = new List<string> { steamApps };
+            var libraryFolders = new List<string>();
 
             if(libraryFoldersKv != null) {
-                libraryFolders.AddRange(libraryFoldersKv.Children
-                    .Where(libraryFolder => int.TryParse(libraryFolder.Name, out _))
-                    .Select(x => x.Value + "/steamapps")
-                );
+                foreach (var i in libraryFoldersKv.Children) {
+                    var path = GetValue(i, "path");
+                    if (path != null) {
+                        libraryFolders.Add(path + "/steamapps");
+                    }
+                }
             }
 
             return libraryFolders;
@@ -67,15 +75,18 @@ namespace StarboundModsCopy {
         }
 
 
-        public KeyValue GetGameInfo(string gameName) {
+        public Game GetGameInfo(string gameName) {
             foreach(var library in GetLibraries()) {
-                var game = SearthGame(gameName, library);
-                if(game != null) {
-                    return game;
+                var info = SearthGame(gameName, library);
+                if(info != null) {
+                    return new Game() {
+                        library = library, 
+                        info = info
+                    };
                 }
             }
 
-            return null;
+            return new Game();
         }
     }
 }

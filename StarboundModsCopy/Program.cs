@@ -9,14 +9,14 @@ namespace StarboundModsCopy {
                 var stemn = new SteamApps();
                 Console.WriteLine("Find stemn");
 
-                var info = stemn.GetGameInfo("Starbound");
-                if(info == null) {
+                var starbound = stemn.GetGameInfo("Starbound");
+                if(starbound.info == null) {
                     throw new DirectoryNotFoundException("Unable to find Starbound on your computer.");
                 }
-                var appid = SteamApps.GetValue(info, "appid");
-                var installdir = SteamApps.GetValue(info, "installdir");
-                var workshop = stemn.SteamPath + "/steamapps/workshop/content/" + appid;
-                var mods = stemn.SteamPath + "/steamapps/common/" + installdir + "/mods";
+                var appid = SteamApps.GetValue(starbound.info, "appid");
+                var installdir = SteamApps.GetValue(starbound.info, "installdir");
+                var workshop = starbound.library + "/workshop/content/" + appid;
+                var mods = starbound.library + "/common/" + installdir + "/mods";
 
                 Console.WriteLine("Find Starbound");
                 Console.WriteLine("=======================================");
@@ -66,6 +66,10 @@ namespace StarboundModsCopy {
                 Console.WriteLine("\nTargetSite ---\n{0}", ex.TargetSite);
                 Console.ResetColor();
             }
+
+            Console.ReadKey();
         }
+
+
     }
 }
